@@ -3,21 +3,18 @@ package vda5050
 import (
 	"fmt"
 
+	"github.com/1000in1/m/logger"
 	"github.com/1000in1/m/vda5050/instantactions"
 	"github.com/1000in1/m/vda5050/order"
 	"github.com/1000in1/m/vda5050/state"
 )
 
-type Logger interface {
-	INFO(message string)
-	ERROR(message string)
-}
-
 type VDA5050 struct {
+	tag      string
 	State    state.State
 	TaskId   string
 	DeviceId string
-	logger   Logger
+	logger   logger.LoggerIF
 }
 
 func NewVDA5050(deviceID string) *VDA5050 {
@@ -29,6 +26,7 @@ func NewVDA5050(deviceID string) *VDA5050 {
 			NodeStates: []*state.NodeState{},
 			Loads:      []state.Load{},
 		},
+		tag:      "VDA5050",
 		TaskId:   "",
 		DeviceId: deviceID,
 		logger:   nil,
@@ -37,18 +35,18 @@ func NewVDA5050(deviceID string) *VDA5050 {
 
 func (v *VDA5050) INFO(message string) {
 	if v.logger != nil {
-		v.logger.INFO(message)
+		v.logger.INFO(v.tag, message)
 	}
 }
 
 func (v *VDA5050) ERROR(message string) {
 	if v.logger != nil {
-		v.logger.ERROR(message)
+		v.logger.ERROR(v.tag, message)
 	}
 }
 
-func (v *VDA5050) SetLogger(logger Logger) {
-	v.logger = logger
+func (v *VDA5050) SetLogger(l *logger.Logger) {
+	v.logger = l
 }
 
 func (v *VDA5050) UpdateInstantActions(insAction *instantactions.InstantActions) {

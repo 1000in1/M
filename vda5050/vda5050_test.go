@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 	"testing"
-	"time"
 
+	"github.com/1000in1/m/logger"
 	"github.com/1000in1/m/vda5050/instantactions"
 	"github.com/1000in1/m/vda5050/order"
 	"github.com/1000in1/m/vda5050/state"
@@ -284,35 +284,13 @@ func Test_vda5050_Action(t *testing.T) {
 
 }
 
-type MyLogger struct {
-}
-
-func NewMyLogger() *MyLogger {
-
-	return &MyLogger{}
-}
-
-func (s *MyLogger) print(tag string, message string) {
-
-	currentTime := time.Now().Format("2006-01-02 15:04:05.000")
-	logMessage := fmt.Sprintf("[%s][%s]: %s", currentTime, tag, message)
-	fmt.Println(logMessage)
-}
-func (s *MyLogger) INFO(message string) {
-	s.print("INFO", message)
-}
-
-func (s *MyLogger) ERROR(message string) {
-	s.print("ERROR", message)
-}
-
 func Test_vda5050_logger(t *testing.T) {
 
 	vda5050s := vda5050_load_data(t)
 
 	vda5050s.INFO("test1")
 
-	vda5050s.SetLogger(NewMyLogger())
+	vda5050s.SetLogger(logger.NewLogger())
 
 	vda5050s.INFO("test2")
 	vda5050s.ERROR("test3")

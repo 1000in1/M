@@ -4,40 +4,61 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/1000in1/m/logger"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
-type AxMqttClient struct {
+type MqttClient struct {
+	tag            string
 	client_id      string
 	mqtt_broker    string
 	mqtt_user      string
 	mqtt_pass      string
+	logger         logger.LoggerIF
 	client         mqtt.Client
-	onConnectFunc  func(client AxMqttClient)
+	onConnectFunc  func(client MqttClient)
 	onMessagetFunc func(topic string, pyload []byte)
 }
 
-func NewAxMqttClient(client_id string, mqtt_broker string, mqtt_user string, mqtt_pass string) *AxMqttClient {
-	return &AxMqttClient{
+func NewMqttClient(client_id string, mqtt_broker string, mqtt_user string, mqtt_pass string) *MqttClient {
+	return &MqttClient{
+		tag:         "AxMqttClient",
 		client_id:   client_id,
 		mqtt_broker: mqtt_broker,
 		mqtt_user:   mqtt_user,
 		mqtt_pass:   mqtt_pass,
+		logger:      nil,
 	}
 }
 
-func (t *AxMqttClient) Disconnect() {
+func (t *MqttClient) Disconnect() {
 	t.client.Disconnect(250)
 }
 
-func (t *AxMqttClient) Subscribe(topic string, qos byte) bool {
+func (t *MqttClient) INFO(message string) {
+	if t.logger != nil {
+		t.logger.INFO(t.tag, message)
+	}
+}
+
+func (t *MqttClient) ERROR(message string) {
+	if t.logger != nil {
+		t.logger.ERROR(t.tag, message)
+	}
+}
+
+func (t *MqttClient) SetLogger(logger *logger.Logger) {
+	t.logger = logger
+}
+
+func (t *MqttClient) Subscribe(topic string, qos byte) bool {
 
 	if token := t.client.Subscribe(topic, qos, nil); token.Wait() && token.Error() != nil {
 		return false
 	}
 	return true
 }
-func (t *AxMqttClient) Connect(onConnectFunc func(client AxMqttClient), onMessagetFunc func(topic string, pyload []byte)) bool {
+func (t *MqttClient) Connect(onConnectFunc func(client MqttClient), onMessagetFunc func(topic string, pyload []byte)) bool {
 
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(t.mqtt_broker)
@@ -67,20 +88,21 @@ func (t *AxMqttClient) Connect(onConnectFunc func(client AxMqttClient), onMessag
 
 }
 
-func (t *AxMqttClient) messageHandler(client mqtt.Client, msg mqtt.Message) {
+func (t *MqttClient) messageHandler(client mqtt.Client, msg mqtt.Message) {
 	//fmt.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
 
 	t.onMessagetFunc(msg.Topic(), msg.Payload())
 }
 
 // connectionLostHandler handles lost connection and attempts to reconnect
-func (t *AxMqttClient) connectionLostHandler(client mqtt.Client, err error) {
-	fmt.Printf("Connection lost: %v\n", err)
+func (t *MqttClient) connectionLostHandler(client mqtt.Client, err error) {
+
+	t.ERROR(fmt.Sprintf("Connection lost: %v\n", err))
 
 }
 
-func (t *AxMqttClient) onConnect(client mqtt.Client) {
-	fmt.Printf("onConnect \n")
+func (t *MqttClient) onConnect(client mqtt.Client) {
+	t.INFO("onConnect")
 	t.onConnectFunc(*t)
 
 }
