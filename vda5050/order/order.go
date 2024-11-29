@@ -54,6 +54,8 @@ type Order struct {
 	// Optional: Some MC systems do not use zones. Some AGVs do not understand zones. Do not add
 	// to message if no zones are used.
 	ZoneSetID *string `json:"zoneSetId,omitempty"`
+
+	TaskId *string `json:"taskId,-"`
 }
 
 type Edge struct {

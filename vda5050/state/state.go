@@ -9,6 +9,8 @@ package state
 import (
 	"encoding/json"
 	"time"
+
+	"github.com/1000in1/m/vda5050/order"
 )
 
 func UnmarshalState(data []byte) (State, error) {
@@ -30,7 +32,7 @@ type State struct {
 	// When an action is completed, an updated state message is published with actionStatus set
 	// to finished and if applicable with the corresponding resultDescription. The actionStates
 	// are kept until a new order is received.
-	ActionStates []ActionState `json:"actionStates,omitempty"`
+	ActionStates []*ActionState `json:"actionStates,omitempty"`
 	// Defines the position on a map in world coordinates. Each floor has its own map.
 	AgvPosition AgvPosition `json:"agvPosition,omitempty"`
 	// Contains all battery-related information.
@@ -75,7 +77,7 @@ type State struct {
 	NewBaseRequest bool `json:"newBaseRequest,omitempty"`
 	// Array of nodeState-Objects, that need to be traversed for fulfilling the order. Empty
 	// list if idle.
-	NodeStates []NodeState `json:"nodeStates"`
+	NodeStates []*NodeState `json:"nodeStates"`
 	// Current operating mode of the AGV.
 	OperatingMode OperatingMode `json:"operatingMode,omitempty"`
 	// Unique order identification of the current order or the previous finished order. The
@@ -119,6 +121,18 @@ type ActionState struct {
 	// Description of the result, e.g., the result of a RFID-read. Errors will be transmitted in
 	// errors.
 	ResultDescription string `json:"resultDescription,omitempty"`
+
+	//扩展信息
+	ActionParameters []order.ActionParameter `json:"param"`
+
+	// Regulates if the action is allowed to be executed during movement and/or parallel to
+	// other actions.
+	// none: action can happen in parallel with others, including movement.
+	// soft: action can happen simultaneously with others, but not while moving.
+	// hard: no other actions can be performed while this action is running.
+	BlockingType string `json:"blockingType"`
+
+	NodeID string `json:"nodeID"`
 }
 
 // Defines the position on a map in world coordinates. Each floor has its own map.

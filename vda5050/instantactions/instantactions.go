@@ -11,6 +11,8 @@ import (
 	"encoding/json"
 	"errors"
 	"time"
+
+	"github.com/1000in1/m/vda5050/order"
 )
 
 func UnmarshalInstantActions(data []byte) (InstantActions, error) {
@@ -49,7 +51,7 @@ type Action struct {
 	ActionID *string `json:"actionId,omitempty"`
 	// Array of actionParameter-objects for the indicated action e. g. deviceId, loadId,
 	// external Triggers.
-	ActionParameters []ActionParameter `json:"actionParameters,omitempty"`
+	ActionParameters []order.ActionParameter `json:"actionParameters,omitempty"`
 	// Name of action as described in the first column of "Actions and Parameters". Identifies
 	// the function of the action.
 	ActionType *string `json:"actionType,omitempty"`
@@ -58,7 +60,7 @@ type Action struct {
 	// none: action can happen in parallel with others, including movement.
 	// soft: action can happen simultaneously with others, but not while moving.
 	// hard: no other actions can be performed while this action is running.
-	BlockingType *BlockingType `json:"blockingType,omitempty"`
+	BlockingType *order.BlockingType `json:"blockingType,omitempty"`
 }
 
 type ActionParameter struct {
