@@ -58,6 +58,18 @@ func (t *MqttClient) Subscribe(topic string, qos byte) bool {
 	}
 	return true
 }
+func (t *MqttClient) Publish(topic string, pyload []byte) {
+
+	qos := byte(0) // 消息质量等级
+
+	t.client.Publish(topic, qos, false, pyload)
+}
+
+func (t *MqttClient) PublishEx(topic string, pyload []byte, qos byte, retained bool) {
+
+	t.client.Publish(topic, qos, false, pyload)
+}
+
 func (t *MqttClient) Connect(onConnectFunc func(client MqttClient), onMessagetFunc func(topic string, pyload []byte)) bool {
 
 	opts := mqtt.NewClientOptions()

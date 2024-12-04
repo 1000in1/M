@@ -32,11 +32,11 @@ type State struct {
 	// When an action is completed, an updated state message is published with actionStatus set
 	// to finished and if applicable with the corresponding resultDescription. The actionStates
 	// are kept until a new order is received.
-	ActionStates []*ActionState `json:"actionStates,omitempty"`
+	ActionStates []*ActionState `json:"actionStates"`
 	// Defines the position on a map in world coordinates. Each floor has its own map.
-	AgvPosition AgvPosition `json:"agvPosition,omitempty"`
+	AgvPosition AgvPosition `json:"agvPosition"`
 	// Contains all battery-related information.
-	BatteryState BatteryState `json:"batteryState,omitempty"`
+	BatteryState BatteryState `json:"batteryState"`
 	// Used by line guided vehicles to indicate the distance it has been driving past the
 	// "lastNodeId".
 	// Distance is in meters.
@@ -74,31 +74,31 @@ type State struct {
 	// True: AGV is almost at the end of the base and will reduce speed if no new base is
 	// transmitted. Trigger for master control to send new base
 	// False: no base update required.
-	NewBaseRequest bool `json:"newBaseRequest,omitempty"`
+	NewBaseRequest bool `json:"newBaseRequest"`
 	// Array of nodeState-Objects, that need to be traversed for fulfilling the order. Empty
 	// list if idle.
 	NodeStates []*NodeState `json:"nodeStates"`
 	// Current operating mode of the AGV.
-	OperatingMode OperatingMode `json:"operatingMode,omitempty"`
+	OperatingMode OperatingMode `json:"operatingMode"`
 	// Unique order identification of the current order or the previous finished order. The
 	// orderId is kept until a new order is received. Empty string ("") if no previous orderId
 	// is available.
-	OrderID string `json:"orderId,omitempty"`
+	OrderID string `json:"orderId"`
 	// Order Update Identification to identify that an order update has been accepted by the
 	// AGV. "0" if no previous orderUpdateId is available.
-	OrderUpdateID int64 `json:"orderUpdateId,omitempty"`
+	OrderUpdateID int64 `json:"orderUpdateId"`
 	// True: AGV is currently in a paused state, either because of the push of a physical button
 	// on the AGV or because of an instantAction. The AGV can resume the order.
 	// False: The AGV is currently not in a paused state.
-	Paused bool `json:"paused,omitempty"`
+	Paused bool `json:"paused"`
 	// Contains all safety-related information.
-	SafetyState SafetyState `json:"safetyState,omitempty"`
+	SafetyState SafetyState `json:"safetyState"`
 	// Serial number of the AGV.
-	SerialNumber string `json:"serialNumber,omitempty"`
+	SerialNumber string `json:"serialNumber"`
 	// Timestamp in ISO8601 format (YYYY-MM-DDTHH:mm:ss.ssZ).
-	Timestamp string `json:"timestamp,omitempty"`
+	Timestamp string `json:"timestamp"`
 	// The AGVs velocity in vehicle coordinates
-	Velocity Velocity `json:"velocity,omitempty"`
+	Velocity Velocity `json:"velocity"`
 	// Version of the protocol [Major].[Minor].[Patch]
 	Version string `json:"version,omitempty"`
 	// Unique ID of the zone set that the AGV currently uses for path planning. Must be the same
@@ -123,16 +123,18 @@ type ActionState struct {
 	ResultDescription string `json:"resultDescription,omitempty"`
 
 	//扩展信息
-	ActionParameters []order.ActionParameter `json:"param"`
+	ActionParameters []order.ActionParameter `json:"-"`
 
 	// Regulates if the action is allowed to be executed during movement and/or parallel to
 	// other actions.
 	// none: action can happen in parallel with others, including movement.
 	// soft: action can happen simultaneously with others, but not while moving.
 	// hard: no other actions can be performed while this action is running.
-	BlockingType string `json:"blockingType"`
+	BlockingType string `json:"-"`
 
-	NodeID string `json:"nodeID"`
+	NodeID string `json:"-"`
+
+	IsSended bool `json:"-"`
 }
 
 // Defines the position on a map in world coordinates. Each floor has its own map.
@@ -147,14 +149,14 @@ type AgvPosition struct {
 	// 1.0: position known
 	// Optional for vehicles that cannot estimate their localization score.
 	// Only for logging and visualization purposes
-	LocalizationScore float64 `json:"localizationScore,omitempty"`
+	LocalizationScore float64 `json:"localizationScore"`
 	MapDescription    string  `json:"mapDescription,omitempty"`
-	MapID             string  `json:"mapId,omitempty"`
+	MapID             string  `json:"mapId"`
 	// True: position is initialized. False: position is not initizalized.
-	PositionInitialized bool    `json:"positionInitialized,omitempty"`
-	Theta               float64 `json:"theta,omitempty"`
-	X                   float64 `json:"x,omitempty"`
-	Y                   float64 `json:"y,omitempty"`
+	PositionInitialized bool    `json:"positionInitialized"`
+	Theta               float64 `json:"theta"`
+	X                   float64 `json:"x"`
+	Y                   float64 `json:"y"`
 }
 
 // Contains all battery-related information.
