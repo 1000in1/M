@@ -387,3 +387,27 @@ func Benchmark_Test_vda5050_InstantActions(b *testing.B) {
 	sys.MemPrint()
 
 }
+
+func Test_vda5050_array_pop(t *testing.T) {
+
+	var json_str = ``
+
+	json_str = `{  "headerId" : 2886,  "timestamp" : "2024-11-29T06:35:37.027011Z",  "version" : "2.0.0",  "manufacturer" : "test",  "serialNumber" : "test-04",  "orderId" : "AX-A-B1-925244bc8038419c-1",  "orderUpdateId" : 14,  "nodes" : [ {    "nodeId" : "n_d3de58669fb134c017f37f6bd07585d9",    "sequenceId" : 28,    "released" : true,    "actions" : [ ],    "nodePosition" : {      "x" : 17.798,      "y" : -39.255,      "mapId" : "6513c9d1af74e21e16a28fc1",      "allowedDeviationXY" : 0.3,      "allowedDeviationTheta" : 3.141592653589793    }  }, {    "nodeId" : "67160164405904345af8f92e",    "sequenceId" : 30,    "released" : true,    "actions" : [ {      "actionType" : "Drop",      "actionId" : "Order_destination_action_14",      "blockingType" : "SOFT",      "actionParameters" : [ {        "key" : "actions",        "value" : "[{\"type\":48,\"data\":{}}]"      } ]    } ],    "nodePosition" : {      "x" : 17.806,      "y" : -37.887,      "mapId" : "6513c9d1af74e21e16a28fc1",      "theta" : 1.5707963267948966,      "allowedDeviationXY" : 0.3,      "allowedDeviationTheta" : 3.141592653589793    }  } ],  "edges" : [ {    "edgeId" : "reverse_l_c682ae492bcf7ae9dbe21fc4807ccf70",    "sequenceId" : 29,    "released" : true,    "startNodeId" : "n_d3de58669fb134c017f37f6bd07585d9",    "endNodeId" : "67160164405904345af8f92e",    "actions" : [ ],    "maxSpeed" : 1.0  } ],  "routeIndex" : 14,  "routePoints" : [ "6715feff60fdac1f872531b6", "n_fe365511d3e062c5c8160c5a7d6b6751", "n_d7637890c812a9ac53ed578904966f0c", "6731b1b66048b8b3d1687701", "n_f025bd640e54591d8cd1ece899f37027", "n_94462ffc573cf2f7a3f1a13e4e25d7c3", "n_51b07a4e3286525aa3109997b5e2dd87", "n_5befbfa5b7418e3c5118d1cc35ffc01f", "n_b91f48fedde659d775c79c1947537fbb", "n_08950f9d595d0225c1c04660ab6ed592", "6731b1dc38a286c6399f26fe", "n_c38e7246f1649ea559ee34fe0959bad9", "n_ea4c070031ba7d9409b469d303ace432", "n_92f7257de39cc5746956f978d001f8a1", "n_d3de58669fb134c017f37f6bd07585d9", "67160164405904345af8f92e" ],  "routePaths" : [ {    "x" : 21395,    "y" : -51375,    "z" : 0  }, {    "x" : 21398,    "y" : -50023,    "z" : 0  }, {    "x" : 21410,    "y" : -48806,    "z" : 0  }, {    "x" : 23156,    "y" : -48815,    "z" : 0  }, {    "x" : 23173,    "y" : -47393,    "z" : 0  }, {    "x" : 23178,    "y" : -46201,    "z" : 0  }, {    "x" : 23183,    "y" : -45109,    "z" : 0  }, {    "x" : 23188,    "y" : -43852,    "z" : 0  }, {    "x" : 23186,    "y" : -42761,    "z" : 0  }, {    "x" : 23198,    "y" : -41633,    "z" : 0  }, {    "x" : 23192,    "y" : -40462,    "z" : 0  }, {    "x" : 21483,    "y" : -40447,    "z" : 0  }, {    "x" : 19678,    "y" : -40439,    "z" : 0  }, {    "x" : 17810,    "y" : -40454,    "z" : 0  }, {    "x" : 17798,    "y" : -39255,    "z" : 0  }, {    "x" : 17806,    "y" : -37887,    "z" : 0  } ],  "destinationName" : "67160164405904345af8f92e",  "allocatedResources" : [ "n_92f7257de39cc5746956f978d001f8a1", "n_d3de58669fb134c017f37f6bd07585d9", "67160164405904345af8f92e" ],  "finalMovement" : true,  "finalOrder" : true,  "taskId" : "AX-A-B1-925244bc8038419c"}`
+
+	vda5050Order, err := order.UnmarshalOrder([]byte(json_str))
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	vda5050S := NewVDA5050("robot_test_111", "test", "1.0")
+
+	vda5050S.UpdateOrder(&vda5050Order)
+
+	for _, node := range vda5050S.State.NodeStates {
+
+		fmt.Println(node.NodeID)
+
+	}
+
+}

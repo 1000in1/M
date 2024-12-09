@@ -199,3 +199,16 @@ func (v *VDA5050) ClearActionStatus() {
 	v.State.ActionStates = temp
 
 }
+
+func (v *VDA5050) ChangeAgvPosition(mapId string, x, y, theta float64, initFlag bool) {
+	v.lock.Lock()
+	defer v.lock.Unlock()
+
+	agv := v.GetAgvPosition()
+	agv.X = x
+	agv.Y = y
+	agv.Theta = theta
+	agv.MapID = mapId
+	agv.PositionInitialized = initFlag
+
+}
