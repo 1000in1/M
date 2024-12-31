@@ -1,10 +1,12 @@
 package vda5050
 
 import (
+	"fmt"
 	"sync"
 	"sync/atomic"
 
 	"github.com/1000in1/m/logger"
+	mqttclient "github.com/1000in1/m/mqtt_client"
 	"github.com/1000in1/m/vda5050/connection"
 	"github.com/1000in1/m/vda5050/instantactions"
 	"github.com/1000in1/m/vda5050/order"
@@ -21,6 +23,8 @@ type VDA5050 struct {
 	logger        logger.LoggerIF
 	headerID      int64
 	lock          sync.Mutex
+	TopicPrefix   string
+	client        *mqttclient.MqttClient
 }
 
 func NewVDA5050(deviceID string, manufacturer string, ver string) *VDA5050 {
@@ -37,11 +41,13 @@ func NewVDA5050(deviceID string, manufacturer string, ver string) *VDA5050 {
 			Manufacturer: manufacturer,
 			SerialNumber: deviceID,
 		},
-		tag:      "VDA5050",
-		TaskId:   "",
-		DeviceId: deviceID,
-		logger:   nil,
-		headerID: 0,
+		tag:         "VDA5050",
+		TaskId:      "",
+		DeviceId:    deviceID,
+		logger:      nil,
+		headerID:    0,
+		TopicPrefix: "uagv/v2/" + manufacturer + "/" + deviceID,
+		client:      nil,
 	}
 }
 
@@ -319,4 +325,60 @@ func (v *VDA5050) AddLoad(loadID string, position string) {
 
 func (v *VDA5050) ClearLoad() {
 	v.State.Loads = []state.Load{}
+}
+
+func (v *VDA5050) OnConnected(client mqttclient.MqttClient) {
+	v.INFO("mqtt connected")
+
+	client.Subscribe(v.TopicPrefix+"/order", 1)
+	client.Subscribe(v.TopicPrefix+"/instantActions", 1)
+
+	loginInfo, err := v.GetConnectionJsonString(connection.Online)
+	if err != nil {
+		v.ERROR("GetConnectionJsonString error:" + err.Error())
+	} else {
+		client.PublishEx(v.TopicPrefix+"/connection", loginInfo, byte(1), true)
+	}
+
+	v.client = &client
+
+}
+
+func (v *VDA5050) PublishState() {
+
+	str, err := v.GetStateJsonString()
+	if err == nil && v.client != nil {
+		v.client.Publish(v.TopicPrefix+"/state", []byte(str))
+	}
+
+}
+
+func (v *VDA5050) OnMessage(topic string, pyload []byte) {
+	fmt.Println("recv:", topic, string(pyload))
+
+	if topic == v.TopicPrefix+"/order" {
+		vda5050_order, err := order.UnmarshalOrder(pyload)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			v.UpdateOrder(&vda5050_order)
+			v.PublishState()
+		}
+	}
+
+	if topic == v.TopicPrefix+"/instantActions" {
+
+		vda5050_instantactions, err := instantactions.UnmarshalInstantActions(pyload)
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+
+			v.UpdateInstantActions(&vda5050_instantactions)
+			v.PublishState()
+
+		}
+
+	}
+
 }
