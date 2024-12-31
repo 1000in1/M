@@ -1,6 +1,7 @@
 package mqttclient
 
 import (
+	"crypto/tls"
 	"fmt"
 	"time"
 
@@ -61,7 +62,7 @@ func (t *MqttClient) Subscribe(topic string, qos byte) bool {
 func (t *MqttClient) Publish(topic string, pyload []byte) {
 
 	qos := byte(0) // 消息质量等级
-
+	t.INFO(fmt.Sprintf("Publish: %s -> %s", topic, string(pyload)))
 	t.client.Publish(topic, qos, false, pyload)
 }
 
@@ -86,16 +87,25 @@ func (t *MqttClient) Connect(onConnectFunc func(client MqttClient), onMessagetFu
 	opts.SetConnectionLostHandler(t.connectionLostHandler)
 	opts.SetOnConnectHandler(t.onConnect)
 
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+
+	opts.SetTLSConfig(tlsConfig)
+
 	t.client = mqtt.NewClient(opts)
 
 	t.onConnectFunc = onConnectFunc
 	t.onMessagetFunc = onMessagetFunc
 
+	t.INFO("Connecting to broker")
+
 	// Connect to the broker
 	if token := t.client.Connect(); token.Wait() && token.Error() != nil {
+		t.INFO("Connecting to error")
 		return false
 	}
-
+	t.INFO("Connecting to broker")
 	return true
 
 }

@@ -88,7 +88,7 @@ func SegmentInterpolation(p1, p2 Point, dis float64) (Point, error) {
 
 	// 如果两点重合，返回错误
 	if distance == 0 {
-		return Point{}, errors.New("两点重合，无法进行插值")
+		return Point{p1.X, p1.Y}, errors.New("两点重合，无法进行插值")
 	}
 
 	// 计算比例 t
@@ -97,7 +97,7 @@ func SegmentInterpolation(p1, p2 Point, dis float64) (Point, error) {
 	// 如果 dis 大于两点之间的距离，限制 t 为 1，防止超出线段
 	if t > 1 {
 		t = 1
-		return Point{p2.X, p2.Y}, errors.New("距离大于线段长度，放弃插值")
+		return Point{p2.X, p2.Y}, nil //errors.New("距离大于线段长度，放弃插值")
 	}
 
 	// 计算插值点的坐标

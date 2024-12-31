@@ -14,6 +14,7 @@ func Test_order_unmarshal(t *testing.T) {
 		t.Log("UnmarshalOrder error", err)
 	}
 	fmt.Println(*vda5050_order.OrderID, *vda5050_order.OrderUpdateID)
+	fmt.Println(*vda5050_order.FinalMovement, *vda5050_order.FinalOrder, *vda5050_order.TaskId)
 
 	for _, node := range vda5050_order.Nodes {
 		fmt.Println(*node.NodeID, *node.NodePosition.X, *node.NodePosition.Y)

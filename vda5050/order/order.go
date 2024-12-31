@@ -55,7 +55,10 @@ type Order struct {
 	// to message if no zones are used.
 	ZoneSetID *string `json:"zoneSetId,omitempty"`
 
-	TaskId *string `json:"taskId,-"`
+	//Custom properties
+	TaskId        *string `json:"taskId,omitempty"`
+	FinalMovement *bool   `json:"finalMovement,omitempty"`
+	FinalOrder    *bool   `json:"finalOrder,omitempty"`
 }
 
 type Edge struct {

@@ -40,7 +40,7 @@ type State struct {
 	// Used by line guided vehicles to indicate the distance it has been driving past the
 	// "lastNodeId".
 	// Distance is in meters.
-	DistanceSinceLastNode float64 `json:"distanceSinceLastNode,omitempty"`
+	DistanceSinceLastNode float64 `json:"distanceSinceLastNode"`
 	// True: indicates that the AGV is driving and/or rotating. Other movements of the AGV
 	// (e.g., lift movements) are not included here.
 	// False: indicates that the AGV is neither driving nor rotating
@@ -57,7 +57,7 @@ type State struct {
 	// Array of info-objects. An empty array indicates, that the AGV has no information. This
 	// should only be used for visualization or debugging – it must not be used for logic in
 	// master control.
-	Information []Information `json:"information,omitempty"`
+	Information []Information `json:"information"`
 	// nodeID of last reached node or, if AGV is currently on a node, current node (e.g.,
 	// "node7"). Empty string ("") if no lastNodeId is available.
 	LastNodeID string `json:"lastNodeId"`
@@ -104,7 +104,7 @@ type State struct {
 	// Unique ID of the zone set that the AGV currently uses for path planning. Must be the same
 	// as the one used in the order, otherwise the AGV is to reject the order.
 	// Optional: If the AGV does not use zones, this field can be omitted.
-	ZoneSetID string `json:"zoneSetId,omitempty"`
+	ZoneSetID string `json:"zoneSetId"`
 }
 
 type ActionState struct {
@@ -135,6 +135,8 @@ type ActionState struct {
 	NodeID string `json:"-"`
 
 	IsSended bool `json:"-"`
+
+	CmdID string `json:"-"`
 }
 
 // Defines the position on a map in world coordinates. Each floor has its own map.
@@ -142,7 +144,7 @@ type AgvPosition struct {
 	// Value for position deviation range in meters. Optional for vehicles that cannot estimate
 	// their deviation, e.g., grid-based localization. Only for logging and visualization
 	// purposes.
-	DeviationRange float64 `json:"deviationRange,omitempty"`
+	DeviationRange float64 `json:"deviationRange"`
 	// Describes the quality of the localization and therefore, can be used, e.g., by SLAM-AGV
 	// to describe how accurate the current position information is.
 	// 0.0: position unknown
@@ -150,7 +152,7 @@ type AgvPosition struct {
 	// Optional for vehicles that cannot estimate their localization score.
 	// Only for logging and visualization purposes
 	LocalizationScore float64 `json:"localizationScore"`
-	MapDescription    string  `json:"mapDescription,omitempty"`
+	MapDescription    string  `json:"mapDescription"`
 	MapID             string  `json:"mapId"`
 	// True: position is initialized. False: position is not initizalized.
 	PositionInitialized bool    `json:"positionInitialized"`
@@ -260,9 +262,9 @@ type Load struct {
 	// Point of reference for the location of the bounding box. The point of reference is always
 	// the center of the bounding box bottom surface (at height = 0) and is described in
 	// coordinates of the AGV coordinate system.
-	BoundingBoxReference BoundingBoxReference `json:"boundingBoxReference,omitempty"`
+	BoundingBoxReference BoundingBoxReference `json:"-"`
 	// Dimensions of the loads bounding box in meters.
-	LoadDimensions LoadDimensions `json:"loadDimensions,omitempty"`
+	LoadDimensions LoadDimensions `json:"-"`
 	// Unique identification number of the load (e.g., barcode or RFID). Empty field, if the AGV
 	// can identify the load, but did not identify the load yet. Optional, if the AGV cannot
 	// identify the load.
@@ -304,17 +306,17 @@ type NodeState struct {
 	// Additional information on the node.
 	NodeDescription string `json:"nodeDescription,omitempty"`
 	// Unique node identification
-	NodeID string `json:"nodeId,omitempty"`
+	NodeID string `json:"nodeId"`
 	// Node position. The object is defined in chapter 5.4 Topic: Order (from master control to
 	// AGV).
 	// Optional:Master control has this information. Can be sent additionally, e.g., for
 	// debugging purposes.
-	NodePosition NodePosition `json:"nodePosition,omitempty"`
+	NodePosition NodePosition `json:"-"`
 	// True: indicates that the node is part of the base. False: indicates that the node is part
 	// of the horizon.
-	Released bool `json:"released,omitempty"`
+	Released bool `json:"released"`
 	// sequenceId to discern multiple nodes with same nodeId.
-	SequenceID int64 `json:"sequenceId,omitempty"`
+	SequenceID int64 `json:"sequenceId"`
 }
 
 // Node position. The object is defined in chapter 5.4 Topic: Order (from master control to
@@ -342,11 +344,11 @@ type SafetyState struct {
 // The AGVs velocity in vehicle coordinates
 type Velocity struct {
 	// The AVGs turning speed around its z axis.
-	Omega float64 `json:"omega,omitempty"`
+	Omega float64 `json:"omega"`
 	// The AVGs velocity in its x direction
-	Vx float64 `json:"vx,omitempty"`
+	Vx float64 `json:"vx"`
 	// The AVGs velocity in its y direction
-	Vy float64 `json:"vy,omitempty"`
+	Vy float64 `json:"vy"`
 }
 
 // WAITING: waiting for the trigger (passing the mode, entering the edge) PAUSED: paused by
